@@ -128,37 +128,3 @@ if __name__ == '__main__':
     demo_fisher()
     demo_storage()
     print("\nDone.")
-
-def demo_slm_loader():
-    \"\"\"
-    3. SLM V3/V4 数据库适配示例
-    从SQLite加载记忆到FisherRetrieval
-    \"\"\"
-    print("\n" + "=" * 50)
-    print("3. SLM Database Loader")
-    print("=" * 50)
-    import sqlite3
-    from gauge_memory.retrieval import FisherRetrieval
-
-    db_path = "slm_v4_memory.db"
-    store = FisherRetrieval()
-    
-    try:
-        conn = sqlite3.connect(db_path)
-        cur = conn.execute("SELECT rowid, date, damping_ratio, poincare_cv, jerk, band_position FROM dim7_damping LIMIT 5")
-        count = 0
-        for row in cur:
-            key, dt, zeta, cv, jerk, band = row
-            vec = np.array([float(zeta or 0), float(cv or 0.5), float(jerk or 0), float(band or 0.5)])
-            store.add(f"mem_{key}", vec, metadata={"date": dt, "code": key})
-            count += 1
-        conn.close()
-        print(f"  Loaded {count} memories from {db_path}")
-    except Exception as e:
-        print(f"  DB load skipped: {e}")
-
-
-if __name__ == '__main__':
-    demo_contradiction()
-    demo_langevin()
-    demo_slm_loader()
